@@ -26,7 +26,32 @@ const SEASON_NAMES = {
   kk: "Kakashi's Story"
 };
 
-const POSTER = 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg';
+// ----- Poster per Season (Arc) -----
+const SEASON_POSTERS = {
+  0:  'https://static.wikia.nocookie.net/naruto/images/2/21/Land_of_Waves_Arc.png/revision/latest',
+  1:  'https://static.wikia.nocookie.net/naruto/images/a/a3/Chunin_Exams_Arc.png/revision/latest',
+  2:  'https://static.wikia.nocookie.net/naruto/images/6/6a/Search_for_Tsunade_Arc.png/revision/latest',
+  3:  'https://static.wikia.nocookie.net/naruto/images/0/0e/Sasuke_Retrieval_Arc.png/revision/latest',
+  4:  'https://static.wikia.nocookie.net/naruto/images/e/e0/Kazekage_Rescue_Arc.png/revision/latest',
+  5:  'https://static.wikia.nocookie.net/naruto/images/3/3a/Tenchi_Bridge_Arc.png/revision/latest',
+  6:  'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest',
+  7:  'https://static.wikia.nocookie.net/naruto/images/b/be/Itachi_Pursuit_Arc.png/revision/latest',
+  8:  'https://static.wikia.nocookie.net/naruto/images/a/a0/Jiraiya_the_Gallant_Arc.png/revision/latest',
+  9:  'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest', // fallback
+  10: 'https://static.wikia.nocookie.net/naruto/images/1/1c/Pain%27s_Assault_Arc.png/revision/latest',
+  11: 'https://static.wikia.nocookie.net/naruto/images/f/f3/Five_Kage_Summit_Arc.png/revision/latest',
+  12: 'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest', // fallback
+  13: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest',
+  14: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
+  15: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
+  16: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
+  17: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
+  18: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
+  19: 'https://static.wikia.nocookie.net/naruto/images/5/5c/Epilogue_Arc.png/revision/latest',
+  kk: 'https://static.wikia.nocookie.net/naruto/images/1/1c/Kakashi_Chronicles_Arc.png/revision/latest'
+};
+
+const DEFAULT_POSTER = 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg';
 
 // [id, displayTitle, filenameInTorrent, size, season, kind]
 // kind: 'episode' | 'special' | 'final' | 'kakashi'
@@ -198,7 +223,7 @@ const EPISODES = RAW.map(([id, title, filename, size, season, kind], idx) => {
     seasonLabel,
     kind,
     order: idx,
-    poster: POSTER,
+    poster: SEASON_POSTERS[season] || DEFAULT_POSTER,
     description:
       `[${seasonLabel}] ${title}\n\n` +
       `File: ${filename.split('/').pop()}\n` +
