@@ -60,11 +60,11 @@ function handleCatalog(req, res) {
   const search = extra.search || req.query.search || '';
   const skip = parseInt(extra.skip || req.query.skip || '0', 10) || 0;
 
-  if (type !== 'movie' || id !== 'naruto-ocean-cut') {
+  if (type !== 'series' || id !== 'naruto-ocean-cut') {
     return res.json({ metas: [] });
   }
 
-  const metas = getCatalogItems(search, skip);
+  const metas = getCatalogItems();
   res.json({ metas });
 }
 
