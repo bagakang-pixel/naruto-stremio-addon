@@ -1,5 +1,6 @@
 // =============================================================
-//  data.js — Pemetaan Season/Episode -> Filename di torrent
+//  data.js — Series struktur (Season + Episode)
+//  Naruto Ocean Cut Edition
 // =============================================================
 
 const SEASON_NAMES = {
@@ -26,7 +27,6 @@ const SEASON_NAMES = {
   kk: "Kakashi's Story"
 };
 
-// ----- Poster per Season (Arc) -----
 const SEASON_POSTERS = {
   0:  'https://static.wikia.nocookie.net/naruto/images/2/21/Land_of_Waves_Arc.png/revision/latest',
   1:  'https://static.wikia.nocookie.net/naruto/images/a/a3/Chunin_Exams_Arc.png/revision/latest',
@@ -37,24 +37,26 @@ const SEASON_POSTERS = {
   6:  'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest',
   7:  'https://static.wikia.nocookie.net/naruto/images/b/be/Itachi_Pursuit_Arc.png/revision/latest',
   8:  'https://static.wikia.nocookie.net/naruto/images/a/a0/Jiraiya_the_Gallant_Arc.png/revision/latest',
-  9:  'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest', // fallback
   10: 'https://static.wikia.nocookie.net/naruto/images/1/1c/Pain%27s_Assault_Arc.png/revision/latest',
   11: 'https://static.wikia.nocookie.net/naruto/images/f/f3/Five_Kage_Summit_Arc.png/revision/latest',
-  12: 'https://static.wikia.nocookie.net/naruto/images/4/45/Akatsuki_Suppression_Arc.png/revision/latest', // fallback
   13: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest',
-  14: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
-  15: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
-  16: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
-  17: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
-  18: 'https://static.wikia.nocookie.net/naruto/images/6/6c/Fourth_Shinobi_World_War_Arc.png/revision/latest', // fallback
   19: 'https://static.wikia.nocookie.net/naruto/images/5/5c/Epilogue_Arc.png/revision/latest',
   kk: 'https://static.wikia.nocookie.net/naruto/images/1/1c/Kakashi_Chronicles_Arc.png/revision/latest'
 };
 
-const DEFAULT_POSTER = 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg';
+const SERIES_POSTER = 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg';
+const SERIES_BG     = 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg';
+const SERIES_ID     = 'oc.naruto';
+const SERIES_NAME   = 'Naruto Ocean Cut';
 
-// [id, displayTitle, filenameInTorrent, size, season, kind]
-// kind: 'episode' | 'special' | 'final' | 'kakashi'
+// Helper untuk memetakan key season -> nomor season Stremio
+function toSeasonNumber(seasonKey) {
+  return seasonKey === 'kk' ? 100 : Number(seasonKey);
+}
+
+// =============================================================
+//  RAW DATA — [shortId, title, filename, size, seasonKey, kind]
+// =============================================================
 const RAW = [
   // ---------- SEASON 0 — Land of Waves ----------
   ['s0e1',  'Enter Naruto Uzumaki!',                              'Season 0 - Land of Waves/Naruto Episode 1 - Enter Naruto Uzumaki!.mp4',                     '3.66 GiB', 0,  'episode'],
@@ -200,91 +202,104 @@ const RAW = [
   ['kks2', "Kakashi's Story Ep 2 — Jonin Leader",                 "Special Season - Kakashi's Story/Kakashi's Story Episode 2 - Jonin Leader-1.m4v",             '1.29 GiB', 'kk', 'kakashi'],
 ];
 
-// ---- Build EPISODES array ----
-const EPISODES = RAW.map(([id, title, filename, size, season, kind], idx) => {
-  const seasonLabel = SEASON_NAMES[season] || `Season ${season}`;
-  let code;
-  if (kind === 'special') code = id.replace(/^s\d+/, '').toUpperCase(); // sp1, sp2 ...
-  else if (kind === 'final') code = 'FINAL';
-  else if (kind === 'kakashi') code = id.toUpperCase();
-  else {
-    const m = id.match(/^s(\d+)e(\d+)$/);
-    code = m ? `S${String(m[1]).padStart(2, '0')}E${String(m[2]).padStart(2, '0')}` : id.toUpperCase();
-  }
-  const displayName = `Naruto OC · ${code} · ${title}`;
-  return {
-    id: `oc.naruto:${id}`,
-    shortId: id,
-    title: displayName,
+// =============================================================
+//  BUILD EPISODES (dengan nomor season & episode per-arc)
+// =============================================================
+const EPISODES = [];
+const seasonCounters = {};
+
+RAW.forEach(([shortId, title, filename, size, seasonKey, kind], idx) => {
+  const seasonNum = toSeasonNumber(seasonKey);
+  if (!seasonCounters[seasonNum]) seasonCounters[seasonNum] = 0;
+  seasonCounters[seasonNum] += 1;
+  const epNum = seasonCounters[seasonNum];
+
+  const seasonLabel = SEASON_NAMES[seasonKey] || `Season ${seasonKey}`;
+  const poster      = SEASON_POSTERS[seasonKey] || SERIES_POSTER;
+
+  EPISODES.push({
+    id: `${SERIES_ID}:${seasonNum}:${epNum}`,  // ID dipakai Stremio
+    shortId,
+    season: seasonNum,
+    episode: epNum,
+    title,
     rawTitle: title,
     filename,
     size,
-    season,
+    seasonKey,
     seasonLabel,
     kind,
     order: idx,
-    poster: SEASON_POSTERS[season] || DEFAULT_POSTER,
+    poster,
     description:
       `[${seasonLabel}] ${title}\n\n` +
       `File: ${filename.split('/').pop()}\n` +
       `Size: ${size}\n` +
-      `Type: ${kind}\n\n` +
-      `Naruto (2002) — The Ocean Cut Edition. Fan-made re-edit tanpa filler, flashback berlebihan, dan rekap.`
-  };
+      `Type: ${kind}`
+  });
 });
 
 const EPISODES_BY_ID = Object.fromEntries(EPISODES.map(e => [e.id, e]));
 
 function findEpisode(fullId) {
-  // fullId seperti "oc.naruto:s0e1"
   return EPISODES_BY_ID[fullId] || null;
 }
 
-function getCatalogItems(search = '', skip = 0) {
-  let list = EPISODES.slice();
-  if (search && search.trim()) {
-    const q = search.trim().toLowerCase();
-    list = list.filter(e =>
-      e.rawTitle.toLowerCase().includes(q) ||
-      e.seasonLabel.toLowerCase().includes(q) ||
-      e.shortId.toLowerCase().includes(q)
-    );
-  }
-  const slice = list.slice(skip, skip + 100);
-  return slice.map(e => ({
-    id: e.id,
-    type: 'movie',
-    name: e.title,
-    poster: e.poster,
+// Catalog: hanya 1 item (series utama)
+function getCatalogItems() {
+  return [{
+    id: SERIES_ID,
+    type: 'series',
+    name: SERIES_NAME,
+    poster: SERIES_POSTER,
     posterShape: 'poster',
-    description: e.description,
-    releaseInfo: e.seasonLabel
-  }));
+    description:
+      'Naruto (2002) — The Ocean Cut Edition. Fan-made re-edit tanpa filler, ' +
+      'flashback berlebihan, dan rekap. Setiap "episode" adalah video panjang 50 menit – 2 jam.',
+    releaseInfo: '2002–2007',
+    genres: ['Anime', 'Action', 'Adventure']
+  }];
 }
 
+// Meta: 1 series dengan semua video
 function getMeta(fullId) {
-  const e = findEpisode(fullId);
-  if (!e) return null;
-  return {
+  if (fullId !== SERIES_ID) return null;
+
+  const videos = EPISODES.map(e => ({
     id: e.id,
-    type: 'movie',
-    name: e.title,
-    poster: e.poster,
-    background: e.poster,
-    logo: e.poster,
-    description: e.description,
-    releaseInfo: `${e.seasonLabel} · ${e.size}`,
+    title: e.title,
+    season: e.season,
+    episode: e.episode,
+    thumbnail: e.poster,
+    overview: e.description,
+    released: new Date(Date.UTC(2002, 9, 3)).toISOString()
+  }));
+
+  return {
+    id: SERIES_ID,
+    type: 'series',
+    name: SERIES_NAME,
+    poster: SERIES_POSTER,
+    background: SERIES_BG,
+    logo: SERIES_POSTER,
+    description:
+      'Naruto (2002) — The Ocean Cut Edition.\n\n' +
+      'Fan-made re-edit tanpa filler, flashback berlebihan, rekap, dan pacing lambat. ' +
+      'Setiap "episode" adalah video panjang 50 menit – 2 jam, mengelompokkan beberapa ' +
+      'episode TV menjadi satu tontonan sinematik.',
+    releaseInfo: '2002–2007',
     genres: ['Anime', 'Action', 'Adventure'],
-    videos: []
+    videos
   };
 }
 
 module.exports = {
   EPISODES,
   SEASON_NAMES,
+  SEASON_POSTERS,
+  SERIES_POSTER,
+  SERIES_ID,
   findEpisode,
   getCatalogItems,
-  getMeta,
-  SEASON_POSTERS,
-  DEFAULT_POSTER
+  getMeta
 };
