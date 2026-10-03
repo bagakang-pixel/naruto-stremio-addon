@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Naruto Ocean Cut — Configure</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e 40%, #0f3460);
+      color: #eaeaea;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 620px;
+      width: 100%;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+    h1 { margin: 0 0 4px; font-size: 26px; color: #ff7a18; }
+    .sub { opacity: 0.7; font-size: 14px; margin-bottom: 24px; }
+    label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+    input[type=text] {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #333;
+      background: #0d0d17;
+      color: #eaeaea;
+      font-size: 15px;
+      font-family: monospace;
+      margin-bottom: 6px;
+    }
+    input[type=text]:focus {
+      outline: none;
+      border-color: #ff7a18;
+      box-shadow: 0 0 0 3px rgba(255, 122, 24, 0.25);
+    }
+    .hint { font-size: 12px; opacity: 0.6; margin-bottom: 20px; }
+    .hint a { color: #ffb367; text-decoration: none; }
+    .hint a:hover { text-decoration: underline; }
+    .btn {
+      display: inline-block;
+      padding: 12px 22px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #ff7a18, #ff4e00);
+      color: white;
+      text-decoration: none;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform .1s;
+      margin-right: 10px;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn.secondary {
+      background: transparent;
+      border: 1px solid #555;
+      color: #ddd;
+    }
+    .preview {
+      background: #0a0a14;
+      border: 1px dashed #333;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: monospace;
+      font-size: 12px;
+      word-break: break-all;
+      color: #8be;
+      margin: 18px 0;
+      min-height: 42px;
+    }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+    .note {
+      font-size: 12px;
+      opacity: 0.55;
+      margin-top: 22px;
+      line-height: 1.55;
+    }
+    code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🍥 Naruto Ocean Cut</h1>
+    <div class="sub">Stremio Addon · Fan-edit tanpa filler · Powered by TorBox</div>
+
+    <label for="torbox">TorBox API Key (opsional)</label>
+    <input id="torbox" type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" autocomplete="off" />
+    <div class="hint">
+      Dapatkan gratis/berbayar di
+      <a href="https://torbox.app/settings" target="_blank" rel="noopener">torbox.app/settings</a>.
+      Kalau dikosongkan, addon tetap bisa dipakai lewat torrent engine bawaan Stremio.
+    </div>
+
+    <div class="preview" id="preview">(Manifest URL akan muncul di sini)</div>
+
+    <div class="row">
+      <button class="btn" id="install">⚡ Install to Stremio</button>
+      <a class="btn secondary" id="manifestLink" href="#" target="_blank" rel="noopener">Lihat manifest.json</a>
+      <button class="btn secondary" id="copy">📋 Salin URL</button>
+    </div>
+
+    <div class="note">
+      <b>Cara pakai:</b><br />
+      1. Isi TorBox API key (opsional tapi direkomendasikan untuk streaming langsung).<br />
+      2. Klik <b>Install to Stremio</b> — Stremio akan terbuka dan menambahkan addon.<br />
+      3. Buka kategori <code>Naruto Ocean Cut</code> di Stremio → pilih episode → klik stream TorBox.<br />
+      <br />
+      <b>Tanpa API key:</b> addon mengembalikan infoHash torrent. Anda tetap bisa memutar lewat addon torrent lain (Torrentio, dll) atau lewat Stremio torrent engine.
+    </div>
+  </div>
+
+  <script>
+    const base = window.location.origin;
+    const input = document.getElementById('torbox');
+    const preview = document.getElementById('preview');
+    const install = document.getElementById('install');
+    const manifestLink = document.getElementById('manifestLink');
+    const copyBtn = document.getElementById('copy');
+
+    function buildManifestUrl() {
+      const key = input.value.trim();
+      const qs = key ? `?torbox=${encodeURIComponent(key)}` : '';
+      return `${base}/manifest.json${qs}`;
+    }
+
+    function update() {
+      const url = buildManifestUrl();
+      preview.textContent = url;
+      manifestLink.href = url;
+      const deepLink = url.replace(/^https?:\/\//, 'stremio://');
+      install.dataset.deeplink = deepLink;
+    }
+
+    input.addEventListener('input', update);
+    update();
+
+    install.addEventListener('click', () => {
+      window.location.href = install.dataset.deeplink;
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(buildManifestUrl());
+        copyBtn.textContent = '✓ Tersalin!';
+        setTimeout(() => (copyBtn.textContent = '📋 Salin URL'), 1500);
+      } catch (e) {
+        alert('Gagal salin. Silakan salin manual dari preview.');
+      }
+    });
+  </script>
+</body>
+</html>
