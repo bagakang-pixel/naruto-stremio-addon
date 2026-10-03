@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: naruto-ocean-cut
-    runtime: node
-    plan: free
-    buildCommand: npm install
-    startCommand: node index.js
