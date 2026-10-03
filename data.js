@@ -50,8 +50,10 @@ const SERIES_ID     = 'oc.naruto';
 const SERIES_NAME   = 'Naruto Ocean Cut';
 
 // Helper untuk memetakan key season -> nomor season Stremio
+// Season 0 kita = Season 1 di Stremio (karena S0 di Stremio = Specials)
 function toSeasonNumber(seasonKey) {
-  return seasonKey === 'kk' ? 100 : Number(seasonKey);
+  if (seasonKey === 'kk') return 100;
+  return Number(seasonKey) + 1; // 0→1, 1→2, ..., 19→20
 }
 
 // =============================================================
