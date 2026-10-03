@@ -1,4 +1,4 @@
-const { addonBuilder, serveHTTP, publishToCentral } = require('stremio-addon-sdk');
+const { addonBuilder, serveHTTP } = require('stremio-addon-sdk');
 const { getCatalog } = require('./scraping/catalog');
 const { getMeta } = require('./scraping/meta');
 const { getStreams } = require('./scraping/streams');
@@ -37,13 +37,13 @@ builder.defineCatalogHandler(async ({ type, id, extra }) => {
     return { metas: [] };
   }
   try {
-    const metas = await getCatalog({
+    // ✅ getCatalog() sudah mengembalikan { metas: [...] }
+    return await getCatalog({
       search: extra?.search || '',
       skip: extra?.skip || 0,
     });
-    return { metas };
   } catch (err) {
-    console.error('[Catalog]', err.message);
+    console.error('[Catalog Handler]', err.message);
     return { metas: [] };
   }
 });
@@ -55,10 +55,10 @@ builder.defineMetaHandler(async ({ type, id }) => {
   }
   const numericId = id.replace('supjav:', '');
   try {
-    const meta = await getMeta(numericId);
-    return { meta };
+    // ✅ getMeta() mengembalikan { meta: {...} }
+    return await getMeta(numericId);
   } catch (err) {
-    console.error('[Meta]', err.message);
+    console.error('[Meta Handler]', err.message);
     return { meta: null };
   }
 });
@@ -70,21 +70,22 @@ builder.defineStreamHandler(async ({ type, id }) => {
   }
   const numericId = id.replace('supjav:', '');
   try {
+    // ✅ getStreams() mengembalikan array, bungkus dengan { streams }
     const streams = await getStreams(numericId);
     return { streams };
   } catch (err) {
-    console.error('[Stream]', err.message);
+    console.error('[Stream Handler]', err.message);
     return { streams: [] };
   }
 });
 
 // ── Serve ──────────────────────────────────────────────────────
-const interface = builder.getInterface();
+const interface_ = builder.getInterface();
 const port = process.env.PORT || 7000;
 
-serveHTTP(interface, { port }, () => {
-  console.log(`✅ SupJav addon running on http://127.0.0.1:${port}/manifest.json`);
-  console.log(`   Install URL: stremio://127.0.0.1:${port}/manifest.json`);
+serveHTTP(interface_, { port }, () => {
+  console.log(`✅ SupJav addon running on port ${port}`);
+  console.log(`   Manifest: http://0.0.0.0:${port}/manifest.json`);
 });
 
 // Graceful shutdown
