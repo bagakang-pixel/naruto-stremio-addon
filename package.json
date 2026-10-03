@@ -1,18 +1,19 @@
 {
-  "name": "naruto-ocean-cut-addon",
+  "name": "stremio-addon-supjav",
   "version": "1.0.0",
-  "description": "Stremio addon untuk Naruto (2002) the Ocean Cut Edition dengan integrasi TorBox",
-  "main": "index.js",
+  "description": "Stremio addon for SupJav",
+  "main": "addon.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node --watch index.js"
+    "start": "node addon.js",
+    "dev": "node addon.js --launch"
   },
   "dependencies": {
-    "axios": "^1.7.7",
-    "dotenv": "^16.4.5",
-    "express": "^4.21.1"
-  },
-  "engines": {
-    "node": ">=18"
+    "stremio-addon-sdk": "^1.6.0",
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "puppeteer": "^21.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "node-cache": "^5.1.2"
   }
 }
