@@ -9,7 +9,7 @@
     "axios": "^1.6.8",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-*    "stremio-addon-sdk": "*",
+    "stremio-addon-sdk": "*",
     "form-data": "^4.0.0"
   }
 }
