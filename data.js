@@ -285,5 +285,6 @@ module.exports = {
   findEpisode,
   getCatalogItems,
   getMeta,
-  POSTER
+  SEASON_POSTERS,
+  DEFAULT_POSTER
 };
