@@ -8,16 +8,12 @@ module.exports = {
   logo: 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg',
   background: 'https://upload.wikimedia.org/wikipedia/en/9/94/NarutoCoverTankobon1.jpg',
   resources: ['catalog', 'meta', 'stream'],
-  types: ['movie'],
+  types: ['series'],
   catalogs: [
     {
-      type: 'movie',
+      type: 'series',
       id: 'naruto-ocean-cut',
-      name: 'Naruto Ocean Cut',
-      extra: [
-        { name: 'search', isRequired: false },
-        { name: 'skip', isRequired: false }
-      ]
+      name: 'Naruto Ocean Cut'
     }
   ],
   idPrefixes: ['oc.naruto:'],
