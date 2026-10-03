@@ -16,7 +16,7 @@ module.exports = {
       name: 'Naruto Ocean Cut'
     }
   ],
-  idPrefixes: ['oc.naruto:'],
+  idPrefixes: ['oc.naruto'],
   behaviorHints: {
     configurable: true,
     configurationRequired: false
